@@ -64,25 +64,13 @@ class labyrinth_solver:
 		else:
 			center = position_history
 
-		print area 
 		print center
 		radius = 5
 		cv2.circle(cv_image,center,radius,(0,255,0),2)	
 		position_history = center
-		#height, width, depth = temp_ball.shape
-		
 
 		#cv2.imshow("Red Ball", temp_ball)
 		cv2.imshow("Original Image", cv_image)
-    #print max_area
-    #cv2.drawContours(cv_image, contours, -1, (0,255,0), 3)
-    
-    #(x,y),radius = cv2.minEnclosingCircle(best_cnt)
-    #center=(int(x),int(y))
-    #radius=int(radius)
-    #cv2.circle(cv_image,center,radius,(0,255,0),2)
-    #cv2.namedWindow=("Tracking", 5)
-    #cv2.imshow("Tracked Image",cv_image)
 		cv2.waitKey(1)
 
 		try:

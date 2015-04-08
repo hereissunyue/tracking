@@ -8,10 +8,12 @@
 		<param name="io_method" value="mmap"/>
 	</node>
 
-	<node name="image_converter" pkg="tracking" type="tracking.py" output="screen" />
+	<node name="labyrinth_solver" pkg="tracking" type="tracking.py" output="screen" />
 
+<!--
 	<node name="image_view" pkg="image_view" type="image_view" >
 		<remap from="image"	to="final_image" />
 	</node>
+-->
 
 </launch>

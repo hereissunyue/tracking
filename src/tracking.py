@@ -31,20 +31,20 @@ class labyrinth_solver:
 		except CvBridgeError, e:
 			print e
 		
-		# crop out the labyrinth region
-		cv_image = cv_image[16:243, 40:268]
+		# crop out the labyrinth region (y by x)
+		cv_image = cv_image[22:240, 44:268]
 		# resize the image to 200x200 each region is 10x10
-		cv_image = cv2.resize(cv_image, (200, 200)) 
+		cv_image = cv2.resize(cv_image, (400, 400)) 
 		# transfer the image from RGB to HSV
 		hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
 		# Red Ball Segmentation
-		lower_red = np.array([0,100,180])
+		lower_red = np.array([0,100,190])
 		upper_red = np.array([50,150,250])
 		temp_ball = cv2.inRange(hsv_image,lower_red,upper_red)
 		# Erosion and Dilation processing
 		kernel = np.ones((5,5),np.uint8)
-		temp_ball = cv2.dilate(temp_ball,kernel,iterations = 1)
+		temp_ball = cv2.dilate(temp_ball,kernel,iterations = 2)
 		cv2.imshow("Red Ball", temp_ball)
 		# Calculate the contour
 		contours,hierarcy = cv2.findContours(temp_ball,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -65,11 +65,13 @@ class labyrinth_solver:
 			center = position_history
 
 		print center
-		radius = 5
+		radius = 10
 		cv2.circle(cv_image,center,radius,(0,255,0),2)	
 		position_history = center
 
 		#cv2.imshow("Red Ball", temp_ball)
+
+ 
 		cv2.imshow("Original Image", cv_image)
 		cv2.waitKey(1)
 

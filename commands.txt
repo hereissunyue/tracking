@@ -1,0 +1,6 @@
+1. ssh youbot@ubuntu.local
+2. Password: youbot 
+3. export ROS_HOSTNAME=sunyue.local
+4. export ROS_MASTER_URI=http://ubuntu.local:11311/
+5. [On youBot] roslaunch youbot_labyrinth labyrinth.launch
+6. [On laptop] roslaunch tracking tracking.launch

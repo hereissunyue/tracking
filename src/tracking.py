@@ -97,7 +97,9 @@ class labyrinth_solver:
 		# A* for path planning
 		goal = [10,2]
 		current = [gridx, gridy]
-		check = 100
+		precheck = abs(current[0]-goal[0])+abs(current[1]-goal[1])
+		if precheck == 0: check = 0
+		else: check = 100
 		path = np.array([current])
 		backup = np.array([[0,0,0,0]])
 
@@ -148,6 +150,7 @@ class labyrinth_solver:
 			w_cost = int(w_heuristic + w_punish)
 			cost = [n_cost, s_cost, e_cost, w_cost]
 
+
 			# there will be some situations should be taken into consideration
 			index = np.argmin(cost) # where the smallest cost is located
 			mincost = cost[index]
@@ -190,6 +193,42 @@ class labyrinth_solver:
 					backup = np.append([[current[0],current[1],branch[0],branch[1]]], backup, axis=0)
 					# updat the current
 					current = next
+
+				elif (sumcheck >= 2000 and sumcheck < 4000) : # three posible choices
+					if index == 0: next = north
+					elif index == 1: next = south
+					elif index == 2: next = east
+					elif index == 3: next = west
+					# update the path choose the one have the least cost
+					path = np.append(path,[next],axis=0)
+					# update the check for next while
+					precheck = abs(next[0]-goal[0])+abs(next[1]-goal[1])
+					if precheck == 0:
+						check = 0
+					# save the branch to the back up [current, branch]
+					# second cost
+					secondcost = cost
+					secondcost[index] = 2000	# mannually fake the minimum cost choice
+					secondindex = np.argmin(secondcost) # where the smallest cost is located
+					if secondindex == 0: branch1 = north
+					elif secondindex == 1: branch1 = south
+					elif secondindex == 2: branch1 = east
+					elif secondindex == 3: branch1 = west
+
+					thirdcost = secondcost
+					thirdcost[secondindex] = 2000	# mannually fake the minimum cost choice
+					thirdindex = np.argmin(thirdcost) # where the smallest cost is located
+					if thirdindex == 0: branch2 = north
+					elif thirdindex == 1: branch2 = south
+					elif thirdindex == 2: branch2 = east
+					elif thirdindex == 3: branch2 = west
+					# update branch based on cost difference
+					backup = np.append([[current[0],current[1],branch2[0],branch2[1]]], backup, axis=0)
+					backup = np.append([[current[0],current[1],branch1[0],branch1[1]]], backup, axis=0)
+					# updat the current
+					current = next
+
+
 
 			elif mincost>=2000: # there is no next choice we have go to backup branchs
 				# next step is the first ranking branch				

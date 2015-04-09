@@ -8,6 +8,7 @@ import cv2
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from std_msgs.msg import Int32
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,6 +23,7 @@ class labyrinth_solver:
 
 	def __init__(self):
 		self.image_pub = rospy.Publisher("final_image",Image)
+		self.move_pub = rospy.Publisher("move_command",Int32)
 		self.bridge = CvBridge()
 		self.image_sub = rospy.Subscriber("/usb_cam/image_raw",Image,self.callback)
 
@@ -39,13 +41,13 @@ class labyrinth_solver:
 		hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
 		# Red Ball Segmentation
-		lower_red = np.array([0,50,150])
+		lower_red = np.array([0,50,180])
 		upper_red = np.array([50,150,250])
 		temp_ball = cv2.inRange(hsv_image,lower_red,upper_red)
 		# Erosion and Dilation processing
 		kernel = np.ones((3,3),np.uint8)
 		temp_ball = cv2.dilate(temp_ball,kernel,iterations = 2)
-		#cv2.imshow("Red Ball", temp_ball)
+		cv2.imshow("Red Ball", temp_ball)
 		# Calculate the contour
 		contours,hierarcy = cv2.findContours(temp_ball,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		# Select the biggest contout as the target		
@@ -281,13 +283,24 @@ class labyrinth_solver:
 		next = [corpath[1,0],corpath[1,1]]
 
 		# move direction left = 1 right = 2 forward = 3 backward = 4
-		if (current[0] > next[0] and current[1] == next[1]): move = 1
-		elif (current[0] < next[0] and current[1] == next[1]): move = 2
-		elif (current[0] == next[0] and current[1] > next[1]): move = 3
-		elif (current[0] == next[0] and current[1] < next[1]): move = 4
+		if (current[0] > next[0] and current[1] == next[1]): 
+			move = 1
+			print "Move to left", move
+		elif (current[0] < next[0] and current[1] == next[1]): 
+			move = 2
+			print "Move to right", move
+		elif (current[0] == next[0] and current[1] > next[1]): 
+			move = 3
+			print "Move to forward", move
+		elif (current[0] == next[0] and current[1] < next[1]): 
+			move = 4
+			print "Move to backward", move
+		elif (current[0] == goal[0] and current[1] == goal[1]):
+			move = 5
+		else:
+			move = 0
 
-		print move		
-		
+		self.move_pub.publish(Int32(move))
 
 		cv2.waitKey(1)
 

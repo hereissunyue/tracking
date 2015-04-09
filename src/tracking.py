@@ -101,7 +101,7 @@ class labyrinth_solver:
 		if precheck == 0: check = 0
 		else: check = 100
 		path = np.array([current])
-		backup = np.array([[0,0,0,0]])
+		backup = np.array([[gridx, gridy,gridx, gridy]])
 
 
 		while check!=0:
@@ -250,16 +250,44 @@ class labyrinth_solver:
 					check = 0
 				# updat the current
 				current = next
-		
-		# A* algorithm is ended
 
+		# A* algorithm is ended here
+
+		# refine the step path to corner path
+		current = [path[0,0],path[0,1]]
+		corpath = np.array([current])
 		steps = path.shape[0]
+		i = 1
+		while i < steps:
+			onpath = [path[i,0],path[i,1]]
+			if (onpath[0]==current[0] or onpath[1]==current[1]):
+				i = i+1
+			else:
+				corpath = np.append(corpath,[[path[i-1,0],path[i-1,1]]],axis=0)
+				i = i+1
+				current = [path[i-2,0],path[i-2,1]]
+		corpath = np.append(corpath,[goal],axis=0)
+
+		# draw the path on the map animation
+		steps = corpath.shape[0]
 		i = 0
 		while i < steps-1:
-			cv2.line(map_ref,(20*path[i,0]-10,20*path[i,1]-10),(20*path[i+1,0]-10,20*path[i+1,1]-10),(255,0,0),3)
+			cv2.line(map_ref,(20*corpath[i,0]-10,20*corpath[i,1]-10),(20*corpath[i+1,0]-10,20*corpath[i+1,1]-10),(255,0,0),3)
 			i = i+1
-
 		cv2.imshow("Map Image", map_ref)
+
+		# identify the motion of the youBot arm
+		current = [corpath[0,0],corpath[0,1]]
+		next = [corpath[1,0],corpath[1,1]]
+
+		# move direction left = 1 right = 2 forward = 3 backward = 4
+		if (current[0] > next[0] and current[1] == next[1]): move = 1
+		elif (current[0] < next[0] and current[1] == next[1]): move = 2
+		elif (current[0] == next[0] and current[1] > next[1]): move = 3
+		elif (current[0] == next[0] and current[1] < next[1]): move = 4
+
+		print move		
+		
 
 		cv2.waitKey(1)
 
